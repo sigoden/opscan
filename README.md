@@ -5,7 +5,7 @@
 
 A open port scanner.
 
-![screenshot](https://user-images.githubusercontent.com/4012553/216958502-bc379151-9b9e-49ba-ae8e-585c66daec87.png)
+![screenshot](https://user-images.githubusercontent.com/4012553/217023044-f5e22c24-6003-42a2-9640-6508f315230e.png)
 
 ## Install
 
@@ -43,6 +43,11 @@ Scan a single port of a single host
 opscan 192.168.8.5 -p 22
 ```
 
+Scan all ports from 1-65535 by default
+```
+opscan 192.168.8.5
+```
+
 Scan a whole CIDR:
 ```
 opscan 192.168.8.1/24 
@@ -63,11 +68,6 @@ Scan top-N ports:
 opscan -p top100 192.168.8.5
 opscan -p top250 192.168.8.5
 opscan -p top1000 192.168.8.5
-```
-
-Scan all ports from 1-65535:
-```
-opscan 192.168.8.5 -p full
 ```
 
 Adjust batch size and timeout for faster scans：
