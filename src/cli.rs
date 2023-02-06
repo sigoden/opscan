@@ -12,16 +12,17 @@ use crate::ports;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
 pub struct Cli {
-    /// Seconds for waiting connection
-    #[arg(long, short = 't', default_value_t = 2)]
+    /// Maximum time in seconds to scan
+    #[arg(long, short = 't', default_value_t = 3)]
     pub timeout: u16,
-    /// The batch size for port scanning, it increases or slows the speed of scanning
-    #[arg(long, short = 'b', default_value_t = 3000)]
-    pub batch: u16,
-    /// A list of comma sepeared ports to be scanned e.g. 80,443,19-26
-    #[arg(long, short='p', value_delimiter=',', default_value = "top100", value_parser = PortValueParser)]
+    /// Number of parallel port scanning
+    #[arg(long, short = 'b', default_value_t = 4000)]
+    pub batch_size: u16,
+    /// Ports to be scanned e.g. 80,443,19-26
+    #[arg(long, short='p', value_delimiter=',', default_value = "1-65535", value_parser = PortValueParser)]
     pub ports: Vec<PortValue>,
-    /// CIDRs, IPs, or hosts to be scanned
+    /// CIDRs, IPs, or hosts to scan ports
+    #[arg(required = true)]
     pub addresses: Vec<String>,
 }
 
@@ -30,7 +31,6 @@ pub enum PortValue {
     One(u16),
     Range(u16, u16),
     Top(u16),
-    Full,
 }
 
 impl PortValue {
@@ -43,7 +43,6 @@ impl PortValue {
                 .cloned()
                 .take(*v as usize)
                 .collect(),
-            PortValue::Full => (1..=65535).collect(),
         }
     }
 }
@@ -70,9 +69,7 @@ impl TypedValueParser for PortValueParser {
             .to_str()
             .and_then(|v| match v.split_once('-') {
                 None => {
-                    if v == "full" {
-                        Some(PortValue::Full)
-                    } else if let Some(n) = v.strip_prefix("top") {
+                    if let Some(n) = v.strip_prefix("top") {
                         n.parse::<u16>().ok().map(PortValue::Top)
                     } else {
                         v.parse::<u16>().ok().map(PortValue::One)

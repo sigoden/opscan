@@ -24,54 +24,55 @@ Download from [Github Releases](https://github.com/sigoden/opscan/releases), unz
 ```
 A open port scanner
 
-Usage: opscan [OPTIONS] [ADDRESSES]...
+Usage: opscan [OPTIONS] <ADDRESSES>...
 
 Arguments:
-  [ADDRESSES]...  CIDRs, IPs, or hosts to be scanned
+  <ADDRESSES>...  CIDRs, IPs, or hosts to scan ports
 
 Options:
-  -t, --timeout <TIMEOUT>  Seconds for waiting connection [default: 2]
-  -b, --batch <BATCH>      The batch size for port scanning, it increases or slows the speed of scanning [default: 3000]
-  -p, --ports <PORTS>      A list of comma sepeared ports to be scanned e.g. 80,443,19-26 [default: top100]
-  -h, --help               Print help
-  -V, --version            Print version
+  -t, --timeout <TIMEOUT>        Maximum time in seconds to scan [default: 3]
+  -b, --batch-size <BATCH_SIZE>  Number of parallel port scanning [default: 4000]
+  -p, --ports <PORTS>            Ports to be scanned e.g. 80,443,19-26 [default: top1000]
+  -h, --help                     Print help
+  -V, --version                  Print version
 ```
 
-Scan top 100 ports:
+Scan a single port of a single host
+
 ```
-opscan 192.168.1.5
+opscan 192.168.8.5 -p 22
 ```
 
 Scan a whole CIDR:
 ```
-opscan 192.168.1.1/24 
+opscan 192.168.8.1/24 
 ```
 
 Scan a domain
 ```
-opscan www.bing.com
+opscan scanme.nmap.org
 ```
 
 Scan specific ports:
 ```
-opscan -p 80,443,21-23 192.168.1.5
+opscan 192.168.8.5 -p 80,443,21-23 
 ```
 
 Scan top-N ports:
 ```
-opscan -p top10 192.168.1.5
-opscan -p top50 192.168.1.5
-opscan -p top1000 192.168.1.5
+opscan -p top100 192.168.8.5
+opscan -p top250 192.168.8.5
+opscan -p top1000 192.168.8.5
 ```
 
 Scan all ports from 1-65535:
 ```
-opscan -p full 192.168.1.5
+opscan 192.168.8.5 -p full
 ```
 
 Adjust batch size and timeout for faster scans：
 ```
-opscan -p full 192.168.1.5 -b 10000 -t 1
+opscan 192.168.8.5 -b 8000 -t 1
 ```
 
 ## License

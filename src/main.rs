@@ -30,11 +30,11 @@ fn main() {
     }
     let count = addrs.len();
     let timeout = Duration::from_secs(cli.timeout.into());
-    let batch = count.min(cli.batch.into());
+    let batch_size = count.min(cli.batch_size.into());
     #[cfg(unix)]
-    let batch = adjust_batch_size(batch);
+    let batch_size = adjust_batch_size(batch_size);
 
-    let pool = ThreadPool::new(batch);
+    let pool = ThreadPool::new(batch_size);
     let (tx, rx) = channel();
     for (socket_addr, raw_addr) in addrs {
         let tx = tx.clone();
