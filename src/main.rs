@@ -6,7 +6,6 @@ use std::{net::SocketAddr, sync::mpsc::channel, time::Duration};
 
 use clap::Parser;
 use cli::Cli;
-use rlimit::Resource;
 use threadpool::ThreadPool;
 use utils::{is_port_open, parse_addresses};
 
@@ -59,7 +58,7 @@ fn main() {
 
 #[cfg(unix)]
 fn adjust_batch_size(value: usize) -> usize {
-    if let Ok((limit, _)) = Resource::NOFILE.get() {
+    if let Ok((limit, _)) = rlimit::Resource::NOFILE.get() {
         let limit = (limit - 100) as usize;
         if limit < value {
             return limit;
