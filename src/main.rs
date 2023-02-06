@@ -1,5 +1,6 @@
 mod cli;
 mod utils;
+mod ports;
 
 use std::{net::SocketAddr, ops::Mul, sync::mpsc::channel, time::Duration};
 
@@ -18,7 +19,8 @@ fn main() {
         std::process::exit(1);
     }
 
-    let ports: Vec<u16> = cli.ports.iter().flat_map(|v| v.values()).collect();
+    let mut ports: Vec<u16> = cli.ports.iter().flat_map(|v| v.values()).collect();
+	ports.dedup();
 
     let mut addrs: Vec<(SocketAddr, String)> = vec![];
     for (ip, addr) in &ips {
@@ -30,11 +32,11 @@ fn main() {
     let parallel = count.min(cli.jobs.into());
     let timeout = Duration::from_millis(cli.timeout.into());
     let estimated_millisec = timeout.mul((count / parallel) as u32).as_millis();
-	let estimated_sec = if estimated_millisec % 1000 == 0 {
-		estimated_millisec / 1000
-	} else {
-		estimated_millisec / 1000 + 1
-	};
+    let estimated_sec = if estimated_millisec % 1000 == 0 {
+        estimated_millisec / 1000
+    } else {
+        estimated_millisec / 1000 + 1
+    };
     let estimated = if estimated_sec < 60 {
         format!("{estimated_sec}s")
     } else {

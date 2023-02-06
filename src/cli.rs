@@ -1,10 +1,12 @@
 use std::cmp::Ordering;
 
 use clap::{
-    builder::ValueParserFactory,
+    builder::{TypedValueParser, ValueParserFactory},
     error::{ContextKind, ContextValue, ErrorKind},
     Parser,
 };
+
+use crate::ports;
 
 /// Port scanner
 #[derive(Parser, Debug)]
@@ -16,8 +18,8 @@ pub struct Cli {
     /// A number of parallel scannings
     #[arg(long, short = 'j', default_value_t = 256)]
     pub jobs: u16,
-    /// A list of comma separed ports to be scanned.
-    #[arg(long, short='p', value_delimiter=',', default_value = "1-1024", value_parser = PortValueParser)]
+    /// A list of comma separed ports to be scanned e.g. 80,443,19-26
+    #[arg(long, short='p', value_delimiter=',', default_value = "top100", value_parser = PortValueParser)]
     pub ports: Vec<PortValue>,
     /// CIDRs, IPs, or hosts to be scanned
     pub addresses: Vec<String>,
@@ -27,6 +29,8 @@ pub struct Cli {
 pub enum PortValue {
     One(u16),
     Range(u16, u16),
+    Top(u16),
+    Full,
 }
 
 impl PortValue {
@@ -34,6 +38,8 @@ impl PortValue {
         match self {
             PortValue::One(v) => vec![*v],
             PortValue::Range(start, end) => (*start..=*end).collect(),
+			PortValue::Top(v) => ports::NAMP_TOP_PORTS.iter().cloned().take(*v as usize).collect(),
+			PortValue::Full => (1..=65535).collect(),
         }
     }
 }
@@ -47,7 +53,7 @@ impl ValueParserFactory for PortValue {
 
 #[derive(Clone, Debug)]
 pub struct PortValueParser;
-impl clap::builder::TypedValueParser for PortValueParser {
+impl TypedValueParser for PortValueParser {
     type Value = PortValue;
 
     fn parse_ref(
@@ -59,7 +65,15 @@ impl clap::builder::TypedValueParser for PortValueParser {
         value
             .to_str()
             .and_then(|v| match v.split_once('-') {
-                None => v.parse::<u16>().ok().map(PortValue::One),
+                None => {
+					if v == "full" {
+						Some(PortValue::Full)
+					} else if let Some(n) = v.strip_prefix("top") {
+						n.parse::<u16>().ok().map(PortValue::Top)
+					} else {
+						v.parse::<u16>().ok().map(PortValue::One)
+					}
+				},
                 Some((x, y)) => match (x.parse::<u16>().ok(), y.parse::<u16>().ok()) {
                     (Some(x), Some(y)) => match x.cmp(&y) {
                         Ordering::Less => Some(PortValue::Range(x, y)),
