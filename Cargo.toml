@@ -1,0 +1,20 @@
+[package]
+name = "opscan"
+version = "0.1.0"
+edition = "2021"
+authors = ["sigoden <sigoden@gmail.com>"]
+description = "A open port scanner"
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/sigoden/opscan"
+repository = "https://github.com/sigoden/opscan"
+categories = ["command-line-utilities"]
+keywords = ["port", "scanner"]
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cidr-utils = "0.5.10"
+clap = { version = "4.1.4", features = ["derive"] }
+threadpool = "1.8.1"
+trust-dns-resolver = { version = "0.22.0", features = ["dns-over-rustls"] }
