@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 homepage = "https://github.com/sigoden/opscan"
 repository = "https://github.com/sigoden/opscan"
 categories = ["command-line-utilities"]
-keywords = ["port", "scanner"]
+keywords = ["port", "scanner", "scan"]
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -16,5 +16,11 @@ keywords = ["port", "scanner"]
 [dependencies]
 cidr-utils = "0.5.10"
 clap = { version = "4.1.4", features = ["derive"] }
+rlimit = "0.9.1"
 threadpool = "1.8.1"
 trust-dns-resolver = { version = "0.22.0", features = ["dns-over-rustls"] }
+
+[profile.release]
+lto = true
+strip = true
+opt-level = "z"

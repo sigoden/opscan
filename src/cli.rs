@@ -12,13 +12,13 @@ use crate::ports;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
 pub struct Cli {
-    /// Milliseconds for waiting connection
-    #[arg(long, short = 't', default_value_t = 1500)]
+    /// Seconds for waiting connection
+    #[arg(long, short = 't', default_value_t = 2)]
     pub timeout: u16,
     /// The batch size for port scanning, it increases or slows the speed of scanning
-    #[arg(long, short = 'b', default_value_t = 4500)]
+    #[arg(long, short = 'b', default_value_t = 3000)]
     pub batch: u16,
-    /// A list of comma separed ports to be scanned e.g. 80,443,19-26
+    /// A list of comma sepeared ports to be scanned e.g. 80,443,19-26
     #[arg(long, short='p', value_delimiter=',', default_value = "top100", value_parser = PortValueParser)]
     pub ports: Vec<PortValue>,
     /// CIDRs, IPs, or hosts to be scanned

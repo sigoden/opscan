@@ -5,7 +5,7 @@
 
 A open port scanner.
 
-<!-- ![screenshot]() -->
+![screenshot](https://user-images.githubusercontent.com/4012553/216958502-bc379151-9b9e-49ba-ae8e-585c66daec87.png)
 
 ## Install
 
@@ -30,9 +30,9 @@ Arguments:
   [ADDRESSES]...  CIDRs, IPs, or hosts to be scanned
 
 Options:
-  -t, --timeout <TIMEOUT>  Milliseconds for waiting connection [default: 1500]
-  -b, --batch <BATCH>      The batch size for port scanning, it increases or slows the speed of scanning [default: 4500]
-  -p, --ports <PORTS>      A list of comma separed ports to be scanned e.g. 80,443,19-26 [default: top100]
+  -t, --timeout <TIMEOUT>  Seconds for waiting connection [default: 2]
+  -b, --batch <BATCH>      The batch size for port scanning, it increases or slows the speed of scanning [default: 3000]
+  -p, --ports <PORTS>      A list of comma sepeared ports to be scanned e.g. 80,443,19-26 [default: top100]
   -h, --help               Print help
   -V, --version            Print version
 ```
@@ -71,7 +71,7 @@ opscan -p full 192.168.1.5
 
 Adjust batch size and timeout for faster scans：
 ```
-opscan -p full 192.168.1.5 -b 65535 -t 1000
+opscan -p full 192.168.1.5 -b 10000 -t 1
 ```
 
 ## License

@@ -2,10 +2,11 @@ mod cli;
 mod ports;
 mod utils;
 
-use std::{net::SocketAddr, ops::Mul, sync::mpsc::channel, time::Duration};
+use std::{net::SocketAddr, sync::mpsc::channel, time::Duration};
 
 use clap::Parser;
 use cli::Cli;
+use rlimit::Resource;
 use threadpool::ThreadPool;
 use utils::{is_port_open, parse_addresses};
 
@@ -29,41 +30,18 @@ fn main() {
         }
     }
     let count = addrs.len();
-    let parallel = count.min(cli.batch.into());
-    let timeout = Duration::from_millis(cli.timeout.into());
-    let estimated_millisec = timeout.mul((count / parallel) as u32).as_millis();
-    let estimated_sec = if estimated_millisec % 1000 == 0 {
-        estimated_millisec / 1000
-    } else {
-        estimated_millisec / 1000 + 1
-    };
-    let estimated = if estimated_sec < 60 {
-        format!("{estimated_sec}s")
-    } else {
-        let m = estimated_sec / 60;
-        let s = estimated_sec % 60;
-        if s == 0 {
-            format!("{m}m")
-        } else {
-            format!("{m}m {s}")
-        }
-    };
+    let timeout = Duration::from_secs(cli.timeout.into());
+    let batch = count.min(cli.batch.into());
+    #[cfg(unix)]
+    let batch = adjust_batch_size(batch);
 
-    println!(
-        "{}(ips)*{}(ports)={}(addresses), estimated {} to complete\n",
-        ips.len(),
-        ports.len(),
-        count,
-        estimated
-    );
-
-    let pool = ThreadPool::new(parallel);
+    let pool = ThreadPool::new(batch);
     let (tx, rx) = channel();
     for (socket_addr, raw_addr) in addrs {
         let tx = tx.clone();
         pool.execute(move || {
-            tx.send((raw_addr, is_port_open(&socket_addr, timeout)))
-                .unwrap();
+            let is_open = is_port_open(&socket_addr, timeout);
+            tx.send((raw_addr, is_open)).unwrap();
         });
     }
 
@@ -77,4 +55,15 @@ fn main() {
             break;
         }
     }
+}
+
+#[cfg(unix)]
+fn adjust_batch_size(value: usize) -> usize {
+    if let Ok((limit, _)) = Resource::NOFILE.get() {
+        let limit = (limit - 100) as usize;
+        if limit < value {
+            return limit;
+        }
+    }
+    value
 }
