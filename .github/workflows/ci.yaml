@@ -46,5 +46,6 @@ jobs:
     - name: Clippy
       run: cargo clippy --all --all-targets
 
-    - name: Format
-      run: cargo fmt --all --check
+    # It cause overflow on windows, temporarily disabled
+    # - name: Format
+    #   run: cargo fmt --all --check
