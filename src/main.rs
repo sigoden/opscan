@@ -9,6 +9,8 @@ use cli::Cli;
 use threadpool::ThreadPool;
 use utils::{is_port_open, parse_addresses};
 
+use crate::ports::NAMP_TOP_PORTS;
+
 fn main() {
     let cli = Cli::parse();
 
@@ -23,9 +25,13 @@ fn main() {
     ports.dedup();
 
     let mut addrs: Vec<(SocketAddr, String)> = vec![];
+    let mut max_addr_len = 0;
+    let max_port_len = ports.iter().max().unwrap().to_string().len();
+
     for (ip, addr) in &ips {
+        max_addr_len = max_addr_len.max(addr.len());
         for port in &ports {
-            addrs.push((SocketAddr::new(*ip, *port), format!("{}:{}", addr, *port)));
+            addrs.push((SocketAddr::new(*ip, *port), addr.to_string()));
         }
     }
     let count = addrs.len();
@@ -40,15 +46,16 @@ fn main() {
         let tx = tx.clone();
         pool.execute(move || {
             let is_open = is_port_open(&socket_addr, timeout);
-            tx.send((raw_addr, is_open)).unwrap();
+            tx.send((raw_addr, is_open, socket_addr.port())).unwrap();
         });
     }
 
     let mut i = 0;
-    for (addr, is_open) in rx {
+    for (addr, is_open, port) in rx {
         i += 1;
         if is_open {
-            println!("{addr}");
+            let name = NAMP_TOP_PORTS.get(&port).unwrap_or(&"unknown");
+            println!("{addr:max_addr_len$} {port:<max_port_len$} {name}");
         }
         if i == count {
             break;

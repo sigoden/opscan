@@ -40,7 +40,7 @@ impl PortValue {
             PortValue::Range(start, end) => (*start..=*end).collect(),
             PortValue::Top(v) => ports::NAMP_TOP_PORTS
                 .iter()
-                .cloned()
+                .map(|(v, _)| *v)
                 .take(*v as usize)
                 .collect(),
         }
