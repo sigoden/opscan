@@ -10,7 +10,7 @@ use crate::ports::PortValue;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)] // Read from `Cargo.toml`
 pub struct Cli {
-    /// Ports to be scanned e.g. 80,443,19-26
+    /// Ports to be scanned e.g. 22,80-443,top100
     #[arg(long, short='p', value_delimiter=',', value_parser = PortValueParser)]
     pub ports: Vec<PortValue>,
     /// Maximum time in milliseconds to scan

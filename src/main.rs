@@ -55,7 +55,7 @@ fn main() {
     let concurrency = match (cli.concurrency, private) {
         (Some(v), _) => v,
         (None, true) => 65535,
-        (None, false) => 4000,
+        (None, false) => 4096,
     };
 
     let concurrency = (concurrency as usize).min(count);

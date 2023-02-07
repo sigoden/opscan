@@ -38,31 +38,33 @@ Arguments:
   [ADDRESSES]...  CIDRs, IPs, or hosts to scan ports
 
 Options:
-  -p, --ports <PORTS>              Ports to be scanned e.g. 80,443,19-26
+  -p, --ports <PORTS>              Ports to be scanned e.g. 22,80-443,top100
   -t, --timeout <TIMEOUT>          Maximum time in milliseconds to scan
   -c, --concurrency <CONCURRENCY>  Number of concurrent port scanning
   -h, --help                       Print help
   -V, --version                    Print version
 ```
 
-Scan 127.0.0.1:
-```
-opscan
-```
-
-Scan all ports from 1-65535:
-```
-opscan 192.168.8.5
-```
-
-Scan a single port on a single host:
+Scan a single port of a single host:
 ```
 opscan 192.168.8.5 -p 22
+```
+
+Scan all ports of a localhost if no parameters
+```
+opscan # equal to `opscan 127.0.0.1 -p 1-65535`
+```
+
+Different network types have different default scanning ports:
+```
+opscan 127.0.0.1 # for private network, scan 1-65535
+opscan scanme.nmap.org # for none private network, scan top1000
 ```
 
 Scan specific ports:
 ```
 opscan 192.168.8.5 -p 80,443,21-23 
+opscan 192.168.8.5 -p 1-65535
 ```
 
 Scan a whole/range CIDR:
@@ -73,9 +75,14 @@ opscan 192.168.0.0/192.168.255.255
 
 Scan top-N ports:
 ```
-opscan scanme.nmap.org # top1000
+opscan scanme.nmap.org -p top1000
+opscan scanme.nmap.org -p top250
 opscan scanme.nmap.org -p top100 
-opscan scanme.nmap.org -p top250 
+```
+
+Increase concurrency and decrease timeout for faster scans:
+```
+opscan scanme.nmap.org -t 1500 -c 8000
 ```
 
 ## License
