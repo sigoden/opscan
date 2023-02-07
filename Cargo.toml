@@ -16,10 +16,10 @@ keywords = ["port", "scanner", "scan"]
 [dependencies]
 cidr-utils = "0.5.10"
 clap = { version = "4.1.4", features = ["derive"] }
+futures = "0.3.26"
 indexmap = "1.9.2"
 lazy_static = "1.4.0"
-rlimit = "0.9.1"
-threadpool = "1.8.1"
+tokio = { version = "1.25.0", features = ["rt-multi-thread", "rt", "sync", "time"] }
 trust-dns-resolver = { version = "0.22.0", features = ["dns-over-rustls"] }
 
 [profile.release]

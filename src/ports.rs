@@ -1,12 +1,15 @@
-//! Namp top ports
-//!
-//! Use following commands to get list
-//! curl -fsSL  https://raw.githubusercontent.com/nmap/nmap/master/nmap-services | awk '$2~/tcp$/' | sort -r -k3 | awk '{print $2" " $1}' | sed 's/\/tcp//' | awk '{print "("$1", \""$2"\"),"}'
+//! Ports utility
+
+use std::{cmp::Ordering, str::FromStr};
 
 use indexmap::IndexMap;
 use lazy_static::lazy_static;
 
 lazy_static! {
+    /// Nmap top-N ports
+    ///
+    /// Use following commands to get list
+    /// curl -fsSL  https://raw.githubusercontent.com/nmap/nmap/master/nmap-services | awk '$2~/tcp$/' | sort -r -k3 | awk '{print $2" " $1}' | sed 's/\/tcp//' | awk '{print "("$1", \""$2"\"),"}'
     pub static ref NAMP_TOP_PORTS: IndexMap<u16, &'static str> = {
         let mut m = IndexMap::new();
         m.insert(80, "http");
@@ -8377,4 +8380,53 @@ lazy_static! {
         m.insert(1742, "3Com-nsd");
         m
     };
+
+    pub static ref FULL_PORTS: Vec<u16> = (1..=65535).collect();
+    pub static ref TOP1000_PORTS: Vec<u16> = topn_ports(1000);
+}
+
+#[derive(Debug, Clone)]
+pub enum PortValue {
+    One(u16),
+    Range(u16, u16),
+    Top(u16),
+}
+
+impl PortValue {
+    pub fn values(&self) -> Vec<u16> {
+        match self {
+            PortValue::One(v) => vec![*v],
+            PortValue::Range(start, end) => (*start..=*end).collect(),
+            PortValue::Top(n) => topn_ports(*n as usize),
+        }
+    }
+}
+
+impl FromStr for PortValue {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let ret = match s.split_once('-') {
+            None => {
+                if let Some(n) = s.strip_prefix("top") {
+                    n.parse::<u16>().ok().map(PortValue::Top)
+                } else {
+                    s.parse::<u16>().ok().map(PortValue::One)
+                }
+            }
+            Some((x, y)) => match (x.parse::<u16>().ok(), y.parse::<u16>().ok()) {
+                (Some(x), Some(y)) => match x.cmp(&y) {
+                    Ordering::Less => Some(PortValue::Range(x, y)),
+                    Ordering::Equal => Some(PortValue::One(x)),
+                    Ordering::Greater => None,
+                },
+                _ => None,
+            },
+        };
+        ret.ok_or(())
+    }
+}
+
+pub fn topn_ports(n: usize) -> Vec<u16> {
+    NAMP_TOP_PORTS.iter().map(|(v, _)| *v).take(n).collect()
 }

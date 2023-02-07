@@ -1,23 +1,29 @@
+//! Addresses utility
+
 use cidr_utils::cidr::IpCidr;
-use std::{
-    net::{IpAddr, SocketAddr, TcpStream, ToSocketAddrs},
-    time::Duration,
-};
+use lazy_static::lazy_static;
+use std::net::{IpAddr, ToSocketAddrs};
 use trust_dns_resolver::{
     config::{ResolverConfig, ResolverOpts},
     Resolver,
 };
 
-/// Whether a port is opening
-pub fn is_port_open(addr: &SocketAddr, timeout: Duration) -> bool {
-    TcpStream::connect_timeout(addr, timeout).is_ok()
+lazy_static! {
+    static ref CLASS_A: IpCidr = IpCidr::from_str("10.0.0.0/8").unwrap();
+    static ref CLASS_B: IpCidr = IpCidr::from_str("172.16.0.0/12").unwrap();
+    static ref CLASS_C: IpCidr = IpCidr::from_str("192.168.0.0/16").unwrap();
+    static ref LOOPBACK: IpCidr = IpCidr::from_str("127.0.0.0/8").unwrap();
+}
+
+/// Is ip belongs to private network
+pub fn is_private_ip(ip: IpAddr) -> bool {
+    CLASS_C.contains(ip) || CLASS_B.contains(ip) || CLASS_A.contains(ip) || LOOPBACK.contains(ip)
 }
 
 /// Goes through all possible IP inputs (files or via argparsing)
 /// Parses the string(s) into IPs
-pub fn parse_addresses(addresses: &[String]) -> (Vec<(IpAddr, String)>, Vec<&String>) {
+pub fn parse_addresses(addresses: &[String]) -> (Vec<(IpAddr, String)>, bool) {
     let mut ips: Vec<(IpAddr, String)> = Vec::new();
-    let mut unresolved_addresses: Vec<&String> = Vec::new();
     let backup_resolver =
         Resolver::new(ResolverConfig::default(), ResolverOpts::default()).unwrap();
 
@@ -25,12 +31,12 @@ pub fn parse_addresses(addresses: &[String]) -> (Vec<(IpAddr, String)>, Vec<&Str
         let parsed_ips = parse_address(address, &backup_resolver);
         if !parsed_ips.is_empty() {
             ips.extend(parsed_ips);
-        } else {
-            unresolved_addresses.push(address);
         }
     }
 
-    (ips, unresolved_addresses)
+    let private = ips.iter().all(|(ip, _)| is_private_ip(*ip));
+
+    (ips, private)
 }
 
 /// Given a string, parse it as an host, IP address, or CIDR.
@@ -56,4 +62,20 @@ fn resolve_ip_from_host(source: &str, backup_resolver: &Resolver) -> Option<(IpA
         return addrs.iter().next().map(|v| (v, source.to_string()));
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use std::net::Ipv4Addr;
+
+    use super::*;
+
+    #[test]
+    fn test_is_private() {
+        assert!(is_private_ip(IpAddr::V4(Ipv4Addr::new(172, 20, 1, 1))));
+        assert!(is_private_ip(IpAddr::V4(Ipv4Addr::new(192, 168, 8, 1))));
+        assert!(is_private_ip(IpAddr::V4(Ipv4Addr::new(10, 0, 1, 1))));
+        assert!(is_private_ip(IpAddr::V4(Ipv4Addr::new(127, 0, 1, 1))));
+        assert!(!is_private_ip(IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8))));
+    }
 }
