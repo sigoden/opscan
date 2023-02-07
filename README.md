@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/sigoden/opscan/actions/workflows/ci.yaml/badge.svg)](https://github.com/sigoden/opscan/actions/workflows/ci.yaml)
 [![Crates](https://img.shields.io/crates/v/opscan.svg)](https://crates.io/crates/opscan)
+[![Docker Pulls](https://img.shields.io/docker/pulls/sigoden/opscan)](https://hub.docker.com/r/sigoden/opscan)
 
 A open port scanner.
 
@@ -15,9 +16,16 @@ A open port scanner.
 cargo install --force opscan
 ```
 
+### With docker
+
+```
+docker run --rm -it sigoden/opscan opscan.nmap.org
+```
+
 ### Binaries on macOS, Linux, Windows
 
 Download from [Github Releases](https://github.com/sigoden/opscan/releases), unzip and add opscan to your $PATH.
+
 
 ## Usage
 
