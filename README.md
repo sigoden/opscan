@@ -52,13 +52,13 @@ opscan 192.168.8.5 -p 22
 
 Scan all ports of a localhost if no parameters
 ```
-opscan # equal to `opscan 127.0.0.1 -p 1-65535`
+opscan                             # equal to `opscan 127.0.0.1 -p 1-65535`
 ```
 
 Different network types have different default scanning ports:
 ```
-opscan 127.0.0.1 # for private network, scan 1-65535
-opscan scanme.nmap.org # for none private network, scan top1000
+opscan 127.0.0.1                   # for private network, scan 1-65535
+opscan scanme.nmap.org             # for none private network, scan top1000
 ```
 
 Scan specific ports:
