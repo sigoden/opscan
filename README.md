@@ -70,9 +70,9 @@ opscan 192.168.8.5 -p 1-65535
 
 Scan specific CIDRs:
 ```
-opscan 192.168.1
-opscan 192.168.1.0/24 
-opscan 192.168.1.0/192.168.255.255
+opscan -p 22 192.168.8
+opscan -p 22 192.168.8.0/24
+opscan -p 22 192.168.8.0/192.168.255.255
 ```
 
 Default scan ports and timeouts on private/non-dedicated networks:
