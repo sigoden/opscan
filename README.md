@@ -45,39 +45,40 @@ Options:
   -V, --version                    Print version
 ```
 
-Scan a single port of a single host:
+Check if a port is open:
 ```
-opscan 192.168.8.5 -p 22
+opscan scanme.nmap.org -p 80
 ```
 
-Scan all ports of a localhost if no parameters
+Scan top-N ports on a domain:
+```
+opscan scanme.nmap.org -p top100 
+opscan scanme.nmap.org -p top666
+opscan scanme.nmap.org -p top1000
+```
+
+List open ports on localhost:
 ```
 opscan                             # equal to `opscan 127.0.0.1 -p 1-65535`
 ```
 
-Different network types have different default scanning ports:
-```
-opscan 127.0.0.1                   # for private network, scan 1-65535
-opscan scanme.nmap.org             # for none private network, scan top1000
-```
-
 Scan specific ports:
 ```
-opscan 192.168.8.5 -p 80,443,21-23 
+opscan 192.168.8.5 -p 80,443,3000-6000
 opscan 192.168.8.5 -p 1-65535
 ```
 
-Scan a whole/range CIDR:
+Scan specific CIDRs:
 ```
-opscan 192.168.0.0/24 
-opscan 192.168.0.0/192.168.255.255
+opscan 192.168.1
+opscan 192.168.1.0/24 
+opscan 192.168.1.0/192.168.255.255
 ```
 
-Scan top-N ports:
+Default scan ports and timeouts on private/non-dedicated networks:
 ```
-opscan scanme.nmap.org -p top1000
-opscan scanme.nmap.org -p top250
-opscan scanme.nmap.org -p top100 
+opscan 127.0.0.1                   # ports: 1-65535, timeout: 1000
+opscan scanme.nmap.org             # ports: top1000, timeout: 3000
 ```
 
 Increase concurrency and decrease timeout for faster scans:
