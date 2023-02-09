@@ -73,5 +73,5 @@ fn main() {
 
 #[cfg(unix)]
 fn nofile_limit() -> u64 {
-    rlimit::Resource::NOFILE.get().map(|(v, _)| v).unwrap() - 100
+    rlimit::Resource::NOFILE.get().map(|(v, _)| v).unwrap() - 96
 }
