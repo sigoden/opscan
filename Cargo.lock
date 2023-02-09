@@ -523,6 +523,7 @@ dependencies = [
  "futures",
  "indexmap",
  "lazy_static",
+ "rlimit",
  "tokio",
  "trust-dns-resolver",
 ]
@@ -707,6 +708,15 @@ dependencies = [
  "untrusted",
  "web-sys",
  "winapi",
+]
+
+[[package]]
+name = "rlimit"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8a29d87a652dc4d43c586328706bb5cdff211f3f39a530f240b53f7221dab8e"
+dependencies = [
+ "libc",
 ]
 
 [[package]]

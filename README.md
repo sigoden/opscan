@@ -6,7 +6,7 @@
 
 A open port scanner.
 
-![screenshot](https://user-images.githubusercontent.com/4012553/217132939-42a8f375-fe66-4210-aacd-c02650a460f2.png)
+![screenshot](https://user-images.githubusercontent.com/4012553/217747118-c3b4b1e5-62c6-4e48-b2ef-f6e1b0485177.png)
 
 ## Install
 
