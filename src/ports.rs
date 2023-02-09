@@ -8396,7 +8396,7 @@ impl PortValue {
     pub fn values(&self) -> Vec<u16> {
         match self {
             PortValue::One(v) => vec![*v],
-            PortValue::Range(start, end) => (*start..=*end).collect(),
+            PortValue::Range(start, end) => ((*start.max(&1))..=*end).collect(),
             PortValue::Top(n) => topn_ports(*n as usize),
         }
     }

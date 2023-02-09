@@ -59,6 +59,8 @@ fn main() {
     };
 
     let concurrency = (concurrency as usize).min(count);
+    #[cfg(unix)]
+    let concurrency = concurrency.min(nofile_limit() as usize);
 
     let scanner = scanner::Scanner::new(&addrs, timeout, concurrency);
 
@@ -67,4 +69,9 @@ fn main() {
         .build()
         .unwrap()
         .block_on(scanner.run());
+}
+
+#[cfg(unix)]
+fn nofile_limit() -> u64 {
+    rlimit::Resource::NOFILE.get().map(|(v, _)| v).unwrap() - 96
 }
