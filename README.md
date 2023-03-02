@@ -88,8 +88,8 @@ opscan scanme.nmap.org -t 1500 -c 8000
 
 ## License
 
-Copyright (c) 2022 opscan-developers.
+Copyright (c) 2023 opscan-developers.
 
-argc is made available under the terms of either the MIT License or the Apache License 2.0, at your option.
+opscan is made available under the terms of either the MIT License or the Apache License 2.0, at your option.
 
 See the LICENSE-APACHE and LICENSE-MIT files for license details.
